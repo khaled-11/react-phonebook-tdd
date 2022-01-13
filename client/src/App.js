@@ -1,12 +1,17 @@
 import React from 'react';
 
 const style = {
-  // PhoneBook_App:{
-  //   display: 'flex', 
-  //   marginTop:'2vh', 
-  //   justifyContent:'center', 
-  //   alignItems:'center'
-  // },
+  center:{
+    display: 'flex', 
+    justifyContent:'center', 
+    alignItems:'center'
+  },
+  centerWithMargin:{
+    display: 'flex', 
+    marginTop:'2vh', 
+    justifyContent:'center', 
+    alignItems:'center'
+  },
   // tbl_btn_1:{
   //   margin:"5px",
   //   padding: "10px 15px",
@@ -29,27 +34,27 @@ const style = {
   //   border: "0.7px solid black",
   //   textAlign:"center"
   // },
-  // table:{
-  //   borderCollapse: "collapse",
-  //   display:"full"
-  // },
-  // tableCell:{
-  //   border: "0.7px solid black",
-  //   padding: "6px 12px",
-  //   width: "max-content",
-  // },
-  // addBtn:{
-  //   backgroundColor: "green",
-  //   fontSize: "16px",
-  //   borderRadius: '5px',
-  //   fontWeight: "700",
-  //   color:'white',
-  //   padding:"6px 12px",
-  // },
-  // addBtnHover:{
-  //   backgroundColor: "white",
-  //   color: "black"
-  // },
+  table:{
+    borderCollapse: "collapse",
+    display:"full"
+  },
+  tableCell:{
+    border: "0.7px solid black",
+    padding: "6px 12px",
+    width: "max-content",
+  },
+  addBtn:{
+    backgroundColor: 'rgb(0, 128, 0)',
+    fontSize: "16px",
+    borderRadius: '5px',
+    fontWeight: "700",
+    color:'white',
+    padding:"6px 12px",
+  },
+  addBtnHover:{
+    backgroundColor: "rgb(255, 255, 255)",
+    color: "black"
+  },
   // cancelBtn:{
   //   backgroundColor: "red",
   //   marginLeft:"15px",
@@ -138,7 +143,7 @@ const style = {
 
 function App() {
   // const [users, setUser] = React.useState([]);  
-  // const [hover, setHover] = React.useState(false);
+  const [hover, setHover] = React.useState(false);
   // const [showAdd, setShowAdd] = React.useState(false);
 
   // const addUser = (user) => {
@@ -211,9 +216,39 @@ function App() {
 
   return (
     <section>
-      <div  className = "header" style={style.PhoneBook_App}>
+      <div  id = "header" style={style.centerWithMargin}>
         <h1>PhoneBook Tutorial</h1>
       </div>
+      <div  id = "addButtonDiv" style={style.center}>
+      <button
+        onMouseEnter={()=>{
+          setHover(true);
+        }}
+        onMouseLeave={()=>{
+          setHover(false);
+        }}
+        id={(hover? "btn_hover":"btn_normal")}
+        style={{...style.addBtn,...(hover ? style.addBtnHover : null)}}
+      >
+        Add Contact
+        </button>
+      </div>
+      <div style={style.centerWithMargin}>
+        <table className = "table" style={style.table} id = "table">
+          <thead>
+            <tr>
+              <th style={style.tableCell}>First name</th>
+              <th style={style.tableCell}>Last name</th>
+              <th style={style.tableCell}>Phone</th>
+              <th style={style.tableCell}>Email</th>
+              <th style={style.tableCell}>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+
       {/* { showAdd ? null: 
       <section>
       <div style={style.PhoneBook_App}>
