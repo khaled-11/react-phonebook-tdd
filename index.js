@@ -20,7 +20,7 @@ const pool = mysql.createPool({
     database:'house'
 })
 
-app.post('/read_contact', function(req, res){
+app.post('/read_contacts', function(req, res){
     var query = pool.query(`select * from phonebook;`);
     let result = []
     query
@@ -32,21 +32,24 @@ app.post('/read_contact', function(req, res){
         console.log(row)
     })
     .on('end', async function() {
-        res.send({data:[{firstname:"khaled", lastname:"Abous", phone:"323", email:"re@"},{firstname:"khals1ed", lastname:"Abo13sdus", phone:"32234323", email:"redsdas@"}]})
+        res.send({data:result})
     });
 })
 
-
 app.post('/add_contact', function(req, res){
-    let data = ''
     req.on('data', chunk => {
         data += chunk
     })
     req.on('end', () => {
         console.log(JSON.parse(data))
     })
-    res.send({data:"good"})
+
+    // let data = {fName:"Khaled", lName:"Abouseada", phone:"3478523322", email:"khaled.abouseada@icloud.com",detail:"N/A"}
+    // var query = pool.query(`insert into phonebook (first_name,last_name,phone,email,more_detail) values("${data.fName}","${data.lName}","${data.phone}","${data.email}","${data.detail}");`);
+    // query
+
 })
+
 
 app.get('/api', function(req, res){
     res.send({data:"hi"})
