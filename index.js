@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors')
 const mysql = require('mysql')
+const path = require('path')
 require('dotenv').config();
 
 // Create the app in express and add CORS
@@ -41,6 +42,11 @@ function get_contact(res){
 // Endpoint to read the contacts
 app.post('/read_contacts', function(req, res){
     get_contact(res)
+})
+
+// The main app page
+app.get('/', function(req, res){
+    res.sendFile(path.join(__dirname, "public" , "index.html"));
 })
 
 // Endpoint to add contact
