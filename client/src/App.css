@@ -1,0 +1,88 @@
+.add-btn {
+  cursor: pointer;
+  border: 1px solid rgb(0, 0, 0);
+  padding: 12px 20px;
+  min-width: 64px;
+  background: rgb(0, 0, 0);
+  transition: all 0.1s ease-in;
+  color: rgb(255, 255, 255);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.add-btn:hover {
+  background: rgb(255, 255, 255);
+  color: rgb(0, 0, 0);
+}
+
+.edit-btn {
+  cursor: pointer;
+  margin-right: 12px;
+  border: 1px solid #767ec9;
+  padding: 8px 15px;
+  min-width: 64px;
+  background: #767ec9;
+  transition: all 0.1s ease-in;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.edit-btn:hover {
+  background: rgb(255, 255, 255);
+  color: #000000;
+}
+
+.delete-btn {
+  cursor: pointer;
+  border: 1px solid #f85959;
+  padding: 8px 15px;
+  min-width: 64px;
+  background: #f85959;
+  transition: all 0.1s ease-in;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.delete-btn:hover {
+  background: rgb(255, 255, 255);
+  color: #000000;
+}
+
+.cancel-btn {
+  cursor: pointer;
+  border: 1px solid #f85959;
+  padding: 8px 15px;
+  min-width: 64px;
+  background: #f85959;
+  transition: all 0.1s ease-in;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cancel-btn:hover {
+  background: rgb(255, 255, 255);
+  color: #000000;
+}
+
+
+
+.submit-btn {
+  cursor: pointer;
+  margin-right: 12px;
+  border: 1px solid #509b62;
+  padding: 8px 15px;
+  min-width: 64px;
+  background: #509b62;
+  transition: all 0.1s ease-in;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.submit-btn:hover {
+  background: rgb(255, 255, 255);
+  color: #000000;
+}

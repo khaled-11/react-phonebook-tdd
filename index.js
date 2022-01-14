@@ -5,7 +5,7 @@ const dotenv = require('dotenv')
 require('dotenv').config();
 
 const app = express();
-app.use(cors('http://localhost:3000'))
+app.use(cors('*'))
 app.use(express.static('./public'))
 app.use(express.json())
 app.use(express.urlencoded({
@@ -20,36 +20,69 @@ const pool = mysql.createPool({
     database:'house'
 })
 
-app.post('/read_contacts', function(req, res){
+function get_contact(res){
     var query = pool.query(`select * from phonebook;`);
     let result = []
     query
     .on('error', function(err) {
-        console.log(err)
+        res.send({data:"error",detail:err})
     })
     .on('result', async function(row) {
         result[result.length] = row
-        console.log(row)
     })
     .on('end', async function() {
         res.send({data:result})
     });
+}
+
+app.post('/read_contacts', function(req, res){
+    get_contact(res)
 })
 
 app.post('/add_contact', function(req, res){
     req.on('data', chunk => {
-        data += chunk
+        let data = JSON.parse(chunk).data
+        let detail = {fName:`${data.first_name}`, lName:`${data.last_name}`, phone:`${data.phone}`, email:`${data.email}`,detail:`${data.detail}`}
+        var query = pool.query(`insert into phonebook (first_name,last_name,phone,email,detail) values("${detail.fName}","${detail.lName}","${detail.phone}","${detail.email}","${detail.detail}");`);
+        query
+        .on('error', function(err) {
+            res.send({data:"error",detail:err})
+        })
+        .on('end', async function() {
+            get_contact(res,"del")
+        });
     })
-    req.on('end', () => {
-        console.log(JSON.parse(data))
-    })
-
-    // let data = {fName:"Khaled", lName:"Abouseada", phone:"3478523322", email:"khaled.abouseada@icloud.com",detail:"N/A"}
-    // var query = pool.query(`insert into phonebook (first_name,last_name,phone,email,more_detail) values("${data.fName}","${data.lName}","${data.phone}","${data.email}","${data.detail}");`);
-    // query
-
 })
 
+
+// var query = pool.query(`CREATE TABLE IF NOT EXISTS phonebook(id int NOT NULL AUTO_INCREMENT PRIMARY KEY, first_name text, last_name text, phone text, email text, detail text)`);
+// query
+// .on('error', function(err) {
+//     console.log(err)
+// })
+// .on('result', async function(row) {
+//     console.log(row)
+// })
+// .on('end', async function() {
+//     console.log("end")
+// });
+
+
+app.post('/delete_contact', function(req, res){
+    req.on('data', chunk => {
+        let toDelete = {}
+        toDelete = JSON.parse(chunk).data
+        console.log(toDelete)
+        var query = pool.query(`delete from phonebook where id = "${toDelete.id}";`);
+        query
+        .on('error', function(err) {
+            res.send({data:"error",detail:err})
+        })
+        .on('end', async function() {
+            get_contact(res,"del")
+        });
+    })
+})
 
 app.get('/api', function(req, res){
     res.send({data:"hi"})
