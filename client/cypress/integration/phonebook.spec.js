@@ -1,13 +1,14 @@
 // import('cypress-get-table')
 
 describe('phonebook test', () => {
-        
     it('is header visible', () => {
         cy.visit('http://localhost:3000/')
+        // Check Header
         cy.get('#header h1').should('have.text', "PhoneBook Tutorial")
     });
 
     it('is add button, table and counter visible', () => {
+        // Check Add button, table for the contacts, and contacts count
         cy.get('#addButtonDiv').should('contain', "Add Contact")
         cy.get('#table').should('contain', "First name")
         cy.get('#table').should('contain', "Last name")
@@ -18,12 +19,13 @@ describe('phonebook test', () => {
     });
 
     it('is add button hide the table and display the add form', () => {
+        // Check that the add contact form is hidden and add button display it
         cy.get('#add_section').should('not.exist');
         cy.get('#table').should('be.visible');
         cy.get('#addButtonDiv button').click()
         cy.get('#addButtonDiv button').should('not.exist');        
-        cy.get('#add_section').should('be.visible');
         cy.get('#table').should('not.exist');
+        // Check the add form elements
         cy.get('#add_section h3').should('contain', "Add Contact")
         cy.get('#add_section form label').should('contain', "First name:")
         cy.get('#add_section form label').should('contain', "Last name:")
@@ -39,14 +41,17 @@ describe('phonebook test', () => {
     });
 
     it('is cancel button and add dummy contact works', () => {
+        // Check cancel button and the display
         cy.get('.cancel-btn').click()
         cy.get('#add_section').should('not.exist');        
         cy.get('#addButtonDiv button').should('be.visible');        
         cy.get('#counter').should('contain', "Total Contacts: 0")
+        // Add dummy contact with the default data
         cy.get('#addButtonDiv button').click()
         cy.get('.submit-btn').click()
         cy.get('#add_section').should('not.exist');        
         cy.get('#addButtonDiv button').should('be.visible');        
+        // Check the table and counter
         cy.get('#counter').should('contain', "Total Contacts: 1")
         cy.get('#table').should('contain', "name@domain.com")
     });
@@ -86,9 +91,8 @@ describe('phonebook test', () => {
         cy.get('#counter').should('contain', "Total Contacts: 0")
     });
 
-
     it('does the app prevent duplicate contacts', () => {
-        // Add first dummy entry  and check count
+        // Add first dummy entry and check count
         cy.get('#addButtonDiv button').click()
         cy.get('.submit-btn').click()
         cy.get('#table').should('contain', "name@domain.com")
@@ -109,7 +113,17 @@ describe('phonebook test', () => {
         cy.get('#counter').should('contain', "Total Contacts: 1")
         cy.contains('td','name@domain.com')
         .siblings().contains('button', 'Delete')
-        .click() 
+        .click()
+        cy.get('#counter').should('contain', "Total Contacts: 0")
+    });
+
+    it('is edit contact works', () => {
+        // Add first dummy entry and check count
+        cy.get('#addButtonDiv button').click()
+        cy.get('.submit-btn').click()
+        cy.contains('td','name@domain.com')
+        .siblings().contains('button', 'Delete')
+        .click()
         cy.get('#counter').should('contain', "Total Contacts: 0")
     });
 })
