@@ -43,7 +43,9 @@ function App() {
   const [contacts, setContacts] = React.useState([]);  
   const [showAdd, setShowAdd] = React.useState(false);
   const [contactData, setContactData] = React.useState(initialContact);
-  const [error, setError] = React.useState("");  
+  const [error, setError] = React.useState("");
+  const [mainError, setMainError] = React.useState([[],[]]);  
+  const [submiting, setSubmitting] = React.useState(true);  
 
   // Load the contacts from the database
   React.useEffect(() => {
@@ -55,10 +57,12 @@ function App() {
       .then(res => res.json())
       .then(
         (result) => {
+          setMainError([[],[]])
           setContacts(result.data);
         },
         (error) => {
-          // Handle Error
+          setMainError([[`Network Connection Error`],[`Please Refresh!`]]
+          )
         }
       )
   }, [])
@@ -74,43 +78,52 @@ function App() {
 
   // Function to handle the form submit
   const handleSubmit = (e) => {
-    // Prevent default and check for errors.
     e.preventDefault();
-    let cuError = false
-    for (let i = 0 ; i < contacts.length ; i++){
-      if (contacts[i].first_name === contactData.first_name && contacts[i].last_name === contactData.last_name){
-        // Display Error
-        setError("This contact already exists.")
+    // Check if in preogress
+    if (submiting){
+      // Prevent multiple submits
+      setSubmitting(false)
+      // Prevent default and check for errors.
+      let cuError = false
+      for (let i = 0 ; i < contacts.length ; i++){
+        if (contacts[i].first_name === contactData.first_name && contacts[i].last_name === contactData.last_name){
+          // Display Error
+          setError("This contact already exists.")
+          cuError = true
+        }
+      }
+      if (!contactData.first_name || !contactData.last_name || !contactData.phone || !contactData.email) {
+        setError("Some Fields can't be empty.")
         cuError = true
       }
-    }
-    if (!contactData.first_name || !contactData.last_name || !contactData.phone || !contactData.email) {
-      setError("Some Fields can't be empty.")
-      cuError = true
-    }
-    // Return to prevent submit and call the API if not.
-    if (cuError){
-      return
-    } else {
-      fetch("http://localhost:3370/add_contact",
-      {
-         method: 'POST',
-         body: JSON.stringify({data: contactData})
-      })
-      .then(res => res.json())
-      .then(
-        (result) => {
-          if (!result.error){
-            console.log(result)
-            setContacts(result.data);
-            setShowAdd(false)
-            setContactData(initialContact)
+      // Return to prevent submit and call the API if not.
+      if (cuError){
+        setSubmitting(true)
+        return
+      } else {
+        fetch("http://localhost:3370/add_contact",
+        {
+          method: 'POST',
+          body: JSON.stringify({data: contactData})
+        })
+        .then(res => res.json())
+        .then(
+          (result) => {
+            if (!result.error){
+              setContacts(result.data);
+              setShowAdd(false)
+              setContactData(initialContact)
+            } else {
+              setError("Network Error! Please refresh and try again.")
+            }
+            setSubmitting(true)
+          },
+          (error) => {
+            setError("Network Error! Please refresh and try again.")
+            setSubmitting(true)
           }
-        },
-        (error) => {
-          // Handle Error
-        }
-      )
+        )
+      }
     }
   };
 
@@ -124,19 +137,30 @@ function App() {
       .then(res => res.json())
       .then(
         (result) => {
-          console.log(result)
           setContacts(result.data);
         },
-        // (error) => {
-        //   // Handle Error
-        // }
+        (error) => {
+          setMainError([[`There was an error. Please try again.`],[]])
+        }
       )
   };
 
   // Edit contact function
   const editFun = (index) => {
-    // Will display an edit form
-    console.log(index)
+    fetch("http://localhost:3370/edit_contact",
+    {
+       method: 'POST',
+       body: JSON.stringify({data: contacts[index]})
+    })
+      .then(res => res.json())
+      .then(
+        (result) => {
+          setContacts(result.data);
+        },
+        (error) => {
+          setMainError([[`There was an error. Please try again.`],[]])
+        }
+      )
   };
 
   // Display the contacts in the table function
@@ -153,11 +177,11 @@ function App() {
               <button
               variant="default"
               className = "edit-btn"
-              onClick={() => editFun(index)}
+              onClick={() => {editFun(index); setMainError([[],[]])}}
               >Edit</button>
               <button 
               style={style.tbl_btn_2}
-              onClick={() => delFun(index)}
+              onClick={() => {delFun(index); setMainError([[],[]])}}
               className = "delete-btn"
               >Delete</button>
             </div>
@@ -208,6 +232,8 @@ function App() {
               </tbody>
             </table>
             <h4 style = {{textAlign:"center"}} id = "counter">Total Contacts: <Count /></h4>
+            <br />
+            <h4 style = {{color:'red',textAlign:"center"}}id = "error_main">{mainError[0]}<br />{mainError[1]}</h4>
           </section>
           : null
         }
@@ -245,7 +271,7 @@ function App() {
               <input type="button"
                   className='cancel-btn'
                   value="Cancel" 
-                  onClick={() =>{setShowAdd(false)}}
+                  onClick={() =>{setShowAdd(false); setError(" ")}}
               />
             </form>
             <h4 style = {{color:'red'}}id = "error_add">{error}</h4>

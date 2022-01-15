@@ -85,6 +85,7 @@ app.post('/edit_contact', function(req, res){
     req.on('data', chunk => {
         let toEdit = {}
         toEdit = JSON.parse(chunk).data
+        console.log(toEdit)
         var query = pool.query(`update phonebook SET first_name = "${toEdit.first_name}", last_name = "${toEdit.last_name}", phone = "${toEdit.phone}", email = "${toEdit.email}", detail = "${toEdit.detail}" where id = "${toEdit.id}";`);
         query
         .on('error', function(err) {
