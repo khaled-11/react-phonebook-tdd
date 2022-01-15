@@ -30,19 +30,10 @@ const style = {
 
 // The entire App is in one function component
 function App() {
-  // The default data for add contact form
-  const initialContact = {
-    first_name: "First Name",
-    last_name: "Last Name",
-    phone: "xxx-xxx-xxxx",
-    email: "name@domain.com",
-    detail: "N/A"
-  };
-
   // Use state to save contacts data and control the display
   const [contacts, setContacts] = React.useState([]);  
   const [showAdd, setShowAdd] = React.useState(false);
-  const [contactData, setContactData] = React.useState(initialContact);
+  const [showEdit, setShowEdit] = React.useState(false);
   const [error, setError] = React.useState("");
   const [mainError, setMainError] = React.useState([[],[]]);  
   const [submiting, setSubmitting] = React.useState(true);  
@@ -66,66 +57,6 @@ function App() {
         }
       )
   }, [])
-
-  // Function to set the state of the form inputs
-  const setFormData = (e) => {
-    setError("")
-    setContactData({
-      ...contactData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  // Function to handle the form submit
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Check if in preogress
-    if (submiting){
-      // Prevent multiple submits
-      setSubmitting(false)
-      // Prevent default and check for errors.
-      let cuError = false
-      for (let i = 0 ; i < contacts.length ; i++){
-        if (contacts[i].first_name === contactData.first_name && contacts[i].last_name === contactData.last_name){
-          // Display Error
-          setError("This contact already exists.")
-          cuError = true
-        }
-      }
-      if (!contactData.first_name || !contactData.last_name || !contactData.phone || !contactData.email) {
-        setError("Some Fields can't be empty.")
-        cuError = true
-      }
-      // Return to prevent submit and call the API if not.
-      if (cuError){
-        setSubmitting(true)
-        return
-      } else {
-        fetch("http://localhost:3370/add_contact",
-        {
-          method: 'POST',
-          body: JSON.stringify({data: contactData})
-        })
-        .then(res => res.json())
-        .then(
-          (result) => {
-            if (!result.error){
-              setContacts(result.data);
-              setShowAdd(false)
-              setContactData(initialContact)
-            } else {
-              setError("Network Error! Please refresh and try again.")
-            }
-            setSubmitting(true)
-          },
-          (error) => {
-            setError("Network Error! Please refresh and try again.")
-            setSubmitting(true)
-          }
-        )
-      }
-    }
-  };
 
   // Delete Contact funtion
   const delFun = (index) => {
@@ -177,7 +108,7 @@ function App() {
               <button
               variant="default"
               className = "edit-btn"
-              onClick={() => {editFun(index); setMainError([[],[]])}}
+              onClick={() => {editFun(index); setShowEdit(true); setMainError([[],[]])}}
               >Edit</button>
               <button 
               style={style.tbl_btn_2}
@@ -196,6 +127,132 @@ function App() {
     return contacts.length
   }
 
+
+  // View for Add form and Edit form.
+  function AddEdit(props){
+    // The default data for add contact form
+    let initialContact
+    if (submiting){
+      initialContact = {
+        first_name: props.first_name,
+        last_name: props.last_name,
+        phone: props.phone,
+        email: props.email,
+        detail: props.detail
+      };
+    } else {
+      initialContact = {
+        first_name: "",
+        last_name: "",
+        phone: "",
+        email: "",
+        detail: ""
+      };
+    }
+
+    const [contactData, setContactData] = React.useState(initialContact);
+    
+    // Function to set the state of the form inputs
+    const setFormData = (e) => {
+      setError("")
+      //props.first_name = e.target.value
+      setContactData({
+        ...contactData,
+        [e.target.name]: e.target.value,
+      });
+    };
+
+    // Function to handle the form submit
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      // Check if in preogress
+      if (submiting){
+        // Prevent multiple submits
+        setSubmitting(false)
+        // Prevent default and check for errors.
+        let cuError = false
+        for (let i = 0 ; i < contacts.length ; i++){
+          if (contacts[i].first_name === contactData.first_name && contacts[i].last_name === contactData.last_name){
+            // Display Error
+            setError("This contact already exists.")
+            cuError = true
+          }
+        }
+        if (!contactData.first_name || !contactData.last_name || !contactData.phone || !contactData.email) {
+          setError("Some Fields can't be empty.")
+          cuError = true
+        }
+        // Return to prevent submit and call the API if not.
+        if (cuError){
+          setSubmitting(true)
+          return
+        } else {
+          fetch("http://localhost:3370/add_contact",
+          {
+            method: 'POST',
+            body: JSON.stringify({data: contactData})
+          })
+          .then(res => res.json())
+          .then(
+            (result) => {
+              if (!result.error){
+                setShowAdd(false)
+                setShowEdit(false)
+                setContacts(result.data);
+              } else {
+                setError("Network Error! Please refresh and try again.")
+              }
+              setSubmitting(true)
+            },
+            (error) => {
+              setError("Network Error! Please refresh and try again.")
+              setSubmitting(true)
+            }
+          )
+        }
+      }
+    };
+    // The return of the function
+    return (
+      <div id = "add_section" style={style.formSection}>
+      <h3>Add Contact</h3>
+      <form id = "add_form" onSubmit={handleSubmit}>
+        <label>First name:</label>
+        <br />
+        <input name="first_name" type="text" value={contactData.first_name} onChange={setFormData}/>
+        <br />
+        <label>Last name:</label>
+        <br />
+        <input name="last_name" type="text" value={contactData.last_name} onChange={setFormData}/>
+        <br />
+        <label>Phone:</label>
+        <br />
+        <input name="phone" type="text" value={contactData.phone} onChange={setFormData}/>
+        <br />
+        <label>Email:</label>
+        <br />
+        <input name="email" type="text"value={contactData.email} onChange={setFormData}/>
+        <br />
+        <label>Details:</label>
+        <br />
+        <input name="detail" type="text"value={contactData.detail} onChange={setFormData}/>
+        <br />
+        <br />
+        <input type="submit"
+          className='submit-btn'
+          value="Add Contact" 
+        />
+        <input type="button"
+            className='cancel-btn'
+            value="Cancel" 
+            onClick={() =>{setShowAdd(false); setShowEdit(false); setError(" ")}}
+        />
+      </form>
+      <h4 style = {{color:'red'}}id = "error_add">{error}</h4>
+    </div>
+    )
+  }
+
   // The return of the App function 
   return (
     <section>      
@@ -203,7 +260,7 @@ function App() {
         <h1>PhoneBook Tutorial</h1>
       </div>
       <div  id = "addButtonDiv" style={style.center}>
-        {!showAdd?
+        {!showAdd && !showEdit?
           <button
             className = "add-btn"
             onClick={()=>{
@@ -215,7 +272,7 @@ function App() {
         :null}
       </div>
       <div style={style.centerWithMargin}>
-        {!showAdd ? 
+        {!showAdd && !showEdit? 
           <section>
             <table className = "table" style={style.table} id = "table">
               <thead>
@@ -240,42 +297,12 @@ function App() {
       </div>
       <div style = {style.center}>
         {showAdd ?  
-          <div id = "add_section" style={style.formSection}>
-            <h3>Add Contact</h3>
-            <form id = "add_form" onSubmit={handleSubmit}>
-              <label>First name:</label>
-              <br />
-              <input name="first_name" type="text" value={contactData.first_name} onChange={setFormData}/>
-              <br />
-              <label>Last name:</label>
-              <br />
-              <input name="last_name" type="text" value={contactData.last_name} onChange={setFormData}/>
-              <br />
-              <label>Phone:</label>
-              <br />
-              <input name="phone" type="text" value={contactData.phone} onChange={setFormData}/>
-              <br />
-              <label>Email:</label>
-              <br />
-              <input name="email" type="text"value={contactData.email} onChange={setFormData}/>
-              <br />
-              <label>Details:</label>
-              <br />
-              <input name="detail" type="text"value={contactData.detail} onChange={setFormData}/>
-              <br />
-              <br />
-              <input type="submit"
-                className='submit-btn'
-                value="Add Contact" 
-              />
-              <input type="button"
-                  className='cancel-btn'
-                  value="Cancel" 
-                  onClick={() =>{setShowAdd(false); setError(" ")}}
-              />
-            </form>
-            <h4 style = {{color:'red'}}id = "error_add">{error}</h4>
-          </div>
+          <AddEdit first_name = {"First name"} last_name = {"Last name"} phone = {"xxx-xxx-xxxx"} email = {"name@domain.com"} detail = {"N/A"}/>
+          :     
+          null
+        }
+        {showEdit ?  
+          <AddEdit first_name = {"First name"} last_name = {"Last name"}/>
           :     
           null
         }
