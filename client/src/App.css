@@ -47,7 +47,25 @@
   font-weight: 600;
 }
 
-.delete-btn:hover {
+.cancel-btn:hover {
+  background: rgb(255, 255, 255);
+  color: #000000;
+}
+
+.cancel-btn2 {
+  cursor: pointer;
+  border: 1px solid #f85959;
+  padding: 8px 15px;
+  min-width: 64px;
+  margin-right: 12px;
+  background: #f85959;
+  transition: all 0.1s ease-in;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.delete-btn2:hover {
   background: rgb(255, 255, 255);
   color: #000000;
 }

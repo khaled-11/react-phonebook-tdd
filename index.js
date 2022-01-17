@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Create the app in express and add CORS
 const app = express();
-app.use(cors('*'))
+// app.use(cors('*'))
 app.use(express.static('./public'))
 app.use(express.json())
 app.use(express.urlencoded({
@@ -40,7 +40,7 @@ function get_contact(res){
 }
 
 // Endpoint to read the contacts
-app.post('/read_contacts', function(req, res){
+app.get('/read_contacts', function(req, res){
     get_contact(res)
 })
 
@@ -69,14 +69,18 @@ app.post('/delete_contact', function(req, res){
     req.on('data', chunk => {
         let toDelete = {}
         toDelete = JSON.parse(chunk).data
-        var query = pool.query(`delete from phonebook where id = "${toDelete.id}";`);
-        query
-        .on('error', function(err) {
-            res.send({data:"error",detail:err})
-        })
-        .on('end', async function() {
-            get_contact(res,"del")
-        });
+        if (toDelete && toDelete.id){
+            var query = pool.query(`delete from phonebook where id = "${toDelete.id}";`);
+            query
+            .on('error', function(err) {
+                res.send({data:"error",detail:err})
+            })
+            .on('end', async function() {
+                get_contact(res,"del")
+            });
+        } else {
+            res.send({data:"error"})
+        }
     })
 })
 
@@ -85,15 +89,18 @@ app.post('/edit_contact', function(req, res){
     req.on('data', chunk => {
         let toEdit = {}
         toEdit = JSON.parse(chunk).data
-        console.log(toEdit)
-        var query = pool.query(`update phonebook SET first_name = "${toEdit.first_name}", last_name = "${toEdit.last_name}", phone = "${toEdit.phone}", email = "${toEdit.email}", detail = "${toEdit.detail}" where id = "${toEdit.id}";`);
-        query
-        .on('error', function(err) {
-            res.send({data:"error",detail:err})
-        })
-        .on('end', async function() {
-            get_contact(res,"del")
-        });
+        if (toEdit && toEdit.id){
+            var query = pool.query(`update phonebook SET first_name = "${toEdit.first_name}", last_name = "${toEdit.last_name}", phone = "${toEdit.phone}", email = "${toEdit.email}", detail = "${toEdit.detail}" where id = "${toEdit.id}";`);
+            query
+            .on('error', function(err) {
+                res.send({data:"error",detail:err})
+            })
+            .on('end', async function() {
+                get_contact(res,"del")
+            });
+        } else {
+            res.send({error:"error"})
+        }
     })
 })
 
